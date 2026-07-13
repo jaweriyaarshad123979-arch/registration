@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Form</title>
+</head>
+<style>
+    * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #0f172a;
+    color: #f8fafc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.form-container {
+    background: #1e293b;
+    padding: 30px;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    position: relative;
+}
+
+h2 {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.input-group {
+    margin-bottom: 18px;
+}
+
+label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 14px;
+    color: #94a3b8;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 6px;
+    color: white;
+    outline: none;
+}
+
+input:focus {
+    border-color: #38bdf8;
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    background: #38bdf8;
+    border: none;
+    color: #0f172a;
+    font-weight: bold;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button:hover {
+    background: #0ea5e9;
+}
+
+.error-msg {
+    color: #ef4444;
+    font-size: 12px;
+    display: block;
+    margin-top: 4px;
+}
+
+.strength-meter {
+    height: 5px;
+    background: #334155;
+    margin-top: 8px;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+#strength-bar {
+    height: 100%;
+    width: 0%;
+    transition: 0.3s;
+}
+
+#strength-text {
+    font-size: 12px;
+    display: block;
+    margin-top: 4px;
+}
+
+.success-card {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: #1e293b;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 20px;
+}
+
+.success-icon {
+    width: 60px; height: 60px;
+    background: #22c55e;
+    color: white;
+    font-size: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+
+.hidden {
+    display: none !important;
+}
+</style>
+<body>
+    <div class="form-container">
+        <h2>Create Account</h2>
+        <form id="registrationForm">
+            <div class="input-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" placeholder="Enter username">
+                <small class="error-msg"></small>
+            </div>
+            
+            <div class="input-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" placeholder="Enter email">
+                <small class="error-msg"></small>
+            </div>
+
+            <div class="input-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Enter password">
+                <div class="strength-meter">
+                    <div id="strength-bar"></div>
+                </div>
+                <small id="strength-text"></small>
+                <small class="error-msg"></small>
+            </div>
+
+            <button type="submit">Register</button>
+        </form>
+
+        <div id="successCard" class="success-card hidden">
+            <div class="success-icon">✓</div>
+            <h3>Registration Successful!</h3>
+            <p>Your account has been created successfully.</p>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('registrationForm');
+const username = document.getElementById('username');
+const email = document.getElementById('email');
+const password = document.getElementById('password');
+const strengthBar = document.getElementById('strength-bar');
+const strengthText = document.getElementById('strength-text');
+const successCard = document.getElementById('successCard');
+
+// Password Strength Meter
+password.addEventListener('input', () => {
+    let val = password.value;
+    let strength = 0;
+
+    if (val.length >= 6) strength++;
+    if (/[A-Z]/.test(val)) strength++;
+    if (/[0-9]/.test(val)) strength++;
+    if (/[^A-Za-z0-9]/.test(val)) strength++;
+
+    if (strength === 0) {
+        strengthBar.style.width = '0%';
+        strengthText.innerText = '';
+    } else if (strength === 1) {
+        strengthBar.style.width = '30%';
+        strengthBar.style.backgroundColor = '#ef4444';
+        strengthText.innerText = 'Weak';
+        strengthText.style.color = '#ef4444';
+    } else if (strength <= 3) {
+        strengthBar.style.width = '60%';
+        strengthBar.style.backgroundColor = '#eab308';
+        strengthText.innerText = 'Medium';
+        strengthText.style.color = '#eab308';
+    } else {
+        strengthBar.style.width = '100%';
+        strengthBar.style.backgroundColor = '#22c55e';
+        strengthText.innerText = 'Strong';
+        strengthText.style.color = '#22c55e';
+    }
+});
+
+// Form Submit Validation
+form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    let isValid = true;
+
+    if (username.value.trim() === '') {
+        showError(username, 'Username is required');
+        isValid = false;
+    } else { showSuccess(username); }
+
+    if (!email.value.includes('@')) {
+        showError(email, 'Enter a valid email');
+        isValid = false;
+    } else { showSuccess(email); }
+
+    if (password.value.length < 6) {
+        showError(password, 'Password must be at least 6 characters');
+        isValid = false;
+    } else { showSuccess(password); }
+
+    if (isValid) {
+        successCard.classList.remove('hidden');
+    }
+});
+
+function showError(input, msg) {
+    const group = input.parentElement;
+    group.querySelector('.error-msg').innerText = msg;
+}
+
+function showSuccess(input) {
+    const group = input.parentElement;
+    group.querySelector('.error-msg').innerText = '';
+}
+    </script>
+</body>
+</html>
